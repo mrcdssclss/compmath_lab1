@@ -16,11 +16,11 @@ def gauss(a):
                 if A[j][i] != 0:
                     A[i], A[j] = A[j], A[i]
                     swaps += 1
-                    print(swaps)
+                    #print(swaps) выводил это
                     f = True
                     break
             if not f:
-                print("матрица вырождена")
+                print("матрица вырождена (есть линейно зависимые строки)")
                 return None, None, None, None
 
         det *= A[i][i]
@@ -56,9 +56,12 @@ def numpy_solution(a):
     B = np.array([row[-1] for row in a])
 
     try:
-        X = np.round(np.linalg.solve(A, B), 2)  # решение системы
         det = round(np.linalg.det(A), 2)  # определитель матрицы
+        X = np.round(np.linalg.solve(A, B), 2)  # решение системы
     except np.linalg.LinAlgError:
+        print("матрица вырождена")
+        return None, None
+    if det == 0:
         print("матрица вырождена")
         return None, None
     print("решение numpy: ")
@@ -76,7 +79,6 @@ def main():
     else:
         print("Неверный ввод")
         return
-
     if not a:
         return
 
@@ -110,23 +112,15 @@ def keyboard_read():
 
 def check(matrix):
     n = len(matrix)
-    # Проверка на несовместность
     for row in matrix:
         if all(x == 0 for x in row[:-1]) and row[-1] != 0:
             return "Система несовместна"
 
-    # Проверка на нулевые столбцы (ранг меньше n)
-    rank = 0
     for i in range(n):
-        # Проверяем, есть ли ненулевой элемент в столбце i среди строк >=i
-        col_nonzero = False
-        for j in range(i, n):
-            if matrix[j][i] != 0:
-                col_nonzero = True
-                break
+        col_nonzero = any(matrix[i][j] != 0 for j in range(n))
         if not col_nonzero:
             return "Система имеет бесконечное число решений"
 
-    return "Система совместна и имеет единственное решение"
+    return ""
 
 main()
